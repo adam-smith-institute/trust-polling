@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trust Poll — polling</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Public+Sans:wght@400;600&family=Space+Grotesk:wght@700&display=swap">
+<style>
+:root{
+ --bone:#EFEDE4;--ink:#23241F;--rule-grey:#A9A79C;--ledger-red:#8B3A3A;--line-inv:#4A4C43;
+ --decrease-3:#2F4B3B;--decrease-2:#6F8F76;--decrease-1:#B3C7B7;--neutral:#B7B4A6;
+ --increase-1:#D3B3B3;--increase-2:#B08282;--increase-3:#8B3A3A;--dontknow:#6E6F64;
+ --display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+ --body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+ --mono:"IBM Plex Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--ink)}
+#stage{position:relative;width:100%;height:100%;overflow:hidden}
+#track{width:100%;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none}
+#track::-webkit-scrollbar{width:0;height:0}
+.slide{width:100%;height:100%;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;overflow:hidden;padding-right:136px}
+.scaler{width:1920px;height:1080px;flex:none;transform:scale(var(--s,0.5))}
+article{width:1920px;height:1080px;padding:84px 104px 72px;background:var(--ink);color:var(--bone);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.mark{position:absolute;top:84px;right:104px;width:239px;text-align:right}
+.mark span{display:block;line-height:1}
+.tagline{font-family:var(--body);font-weight:400;font-size:14.6px;letter-spacing:.05em;color:var(--rule-grey);margin-bottom:3px}
+.word{font-family:var(--display);font-weight:700;font-size:48px;letter-spacing:.01em;color:var(--bone)}
+h1{font-family:var(--display);font-weight:700;font-size:78px;line-height:1.1;letter-spacing:.01em;max-width:1480px;margin:0}
+.desc{font-family:var(--body);font-weight:400;font-size:40px;line-height:1.45;max-width:1500px;margin:30px 0 0}
+.desc strong{font-weight:600}
+.spacer{flex:1;min-height:36px}
+.q{font-family:var(--mono);font-weight:500;font-size:31px;line-height:1.35;letter-spacing:.02em;color:var(--rule-grey);max-width:1620px;margin:0;border-top:2px solid var(--line-inv);padding-top:22px}
+.cond{font-family:var(--mono);font-weight:500;font-size:27px;letter-spacing:.1em;text-transform:uppercase;line-height:1.2;color:var(--rule-grey);margin:26px 0 0}
+.bar{display:flex;width:100%;height:104px;flex:none;margin-top:26px}
+.bar.pair{height:69px}
+.cond + .bar{margin-top:14px}
+.seam{width:3px;flex:none;background:var(--ink)}
+.seg{height:100%;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.seg span{font-family:var(--mono);font-weight:700;font-size:34px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t-decrease-3{background:var(--decrease-3)}.t-decrease-3 span{color:var(--bone)}
+.t-decrease-2{background:var(--decrease-2)}.t-decrease-2 span{color:var(--ink)}
+.t-decrease-1{background:var(--decrease-1)}.t-decrease-1 span{color:var(--ink)}
+.t-neutral{background:var(--neutral)}.t-neutral span{color:var(--ink)}
+.t-increase-1{background:var(--increase-1)}.t-increase-1 span{color:var(--ink)}
+.t-increase-2{background:var(--increase-2)}.t-increase-2 span{color:var(--ink)}
+.t-increase-3{background:var(--increase-3)}.t-increase-3 span{color:var(--bone)}
+.t-dontknow{background:var(--dontknow)}.t-dontknow span{color:var(--bone)}
+.legend{list-style:none;margin:34px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:13px 42px}
+.legend li{display:flex;align-items:center;gap:14px}
+.sw{width:26px;height:26px;flex:none;display:block}
+.lb{font-family:var(--mono);font-weight:400;font-size:29px;letter-spacing:.03em;line-height:1.3;color:var(--bone);white-space:nowrap}
+footer{border-top:2px solid var(--line-inv);margin-top:40px;padding-top:18px;display:flex;flex-direction:column;gap:4px}
+.src{font-family:var(--mono);font-weight:400;font-size:14.6px;line-height:1.5;letter-spacing:.02em;color:var(--rule-grey);margin:0;white-space:nowrap}
+.q2{font-family:var(--mono);font-weight:500;font-size:31px;line-height:1.35;letter-spacing:.02em;color:var(--rule-grey);max-width:1620px;margin:26px 0 0}
+.q2 + .bar{margin-top:14px}
+footer span{font-family:var(--mono);font-size:30px;letter-spacing:.02em;color:var(--bone);white-space:nowrap}
+#rail{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:4px;z-index:3}
+#rail button{display:flex;align-items:baseline;gap:6px}
+#rail .tp{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase}
+#rail button{font-family:var(--mono);font-weight:500;font-size:10.5px;letter-spacing:.08em;padding:4px 3px;background:none;border:0;border-bottom:2px solid transparent;color:var(--rule-grey);cursor:pointer}
+#rail button.on{color:var(--bone);border-bottom-color:var(--ledger-red)}
+</style></head>
+<body>
+<div id="stage">
+<div id="track">
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Doctors are the occupation Britons trust most.</h1>
+<p class="desc"><strong>42%</strong> pick doctors as the most trustworthy occupation, and <strong>20%</strong> pick RNLI lifeboat crews.</p>
+<div class="spacer"></div>
+<p class="q">Which of these occupations do you think is the most trustworthy?</p>
+<div class="bar"><div class="seg t-decrease-3" style="width:calc((100% - 12px) * 0.42)" title="Doctors: 42%"><span>42%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 12px) * 0.2)" title="RNLI lifeboat crews: 20%"><span>20%</span></div><span class="seam"></span><div class="seg t-decrease-1" style="width:calc((100% - 12px) * 0.09)" title="Police: 9%"><span>9%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.18)" title="Other occupations: 18%"><span>18%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.11)" title="Don’t know: 11%"><span>11%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">Doctors</span></li><li><span class="sw t-decrease-2"></span><span class="lb">RNLI lifeboat crews</span></li><li><span class="sw t-decrease-1"></span><span class="lb">Police</span></li><li><span class="sw t-neutral"></span><span class="lb">Other occupations</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Politicians are the least trusted occupation by a distance.</h1>
+<p class="desc"><strong>38%</strong> pick politicians as the least trustworthy occupation, more than twice the <strong>17%</strong> who pick online influencers.</p>
+<div class="spacer"></div>
+<p class="q">And which of these occupations do you think is the least trustworthy?</p>
+<div class="bar"><div class="seg t-increase-3" style="width:calc((100% - 12px) * 0.38)" title="Politicians: 38%"><span>38%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 12px) * 0.17)" title="Online influencers: 17%"><span>17%</span></div><span class="seam"></span><div class="seg t-increase-1" style="width:calc((100% - 12px) * 0.11)" title="Used car salespeople: 11%"><span>11%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.29)" title="Other occupations: 29%"><span>29%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.05)" title="Don’t know: 5%"></div></div>
+
+
+<ul class="legend"><li><span class="sw t-increase-3"></span><span class="lb">Politicians</span></li><li><span class="sw t-increase-2"></span><span class="lb">Online influencers</span></li><li><span class="sw t-increase-1"></span><span class="lb">Used car salespeople</span></li><li><span class="sw t-neutral"></span><span class="lb">Other occupations</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know — 5%</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Britons would wish politics on someone they dislike.</h1>
+<p class="desc">Asked to pick a career for someone they didn’t like, <strong>23%</strong> chose politician, ahead of social media influencer on <strong>16%</strong>.</p>
+<div class="spacer"></div>
+<p class="q">And if you had to pick a career for someone you didn’t like, which of these would you choose?</p>
+<div class="bar"><div class="seg t-increase-3" style="width:calc((100% - 12px) * 0.23)" title="A politician: 23%"><span>23%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 12px) * 0.16)" title="A social media influencer: 16%"><span>16%</span></div><span class="seam"></span><div class="seg t-increase-1" style="width:calc((100% - 12px) * 0.12)" title="A charity worker: 12%"><span>12%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.32)" title="Other careers: 32%"><span>32%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.17)" title="Don’t know: 17%"><span>17%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-increase-3"></span><span class="lb">A politician</span></li><li><span class="sw t-increase-2"></span><span class="lb">A social media influencer</span></li><li><span class="sw t-increase-1"></span><span class="lb">A charity worker</span></li><li><span class="sw t-neutral"></span><span class="lb">Other careers</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>A comedian outscores the PM.</h1>
+<p class="desc"><strong>9%</strong> call John Cleese untrustworthy, against <strong>30%</strong> for Andy Burnham.</p>
+<div class="spacer"></div>
+<p class="q">And how trustworthy or untrustworthy do you think each of the following people is?</p>
+<p class="cond">John Cleese (comedian and actor)</p>
+<div class="bar pair"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.17)" title="Very trustworthy: 17%"><span>17%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.33)" title="Somewhat trustworthy: 33%"><span>33%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.3)" title="Neither: 30%"><span>30%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.05)" title="Somewhat untrustworthy: 5%"></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.04)" title="Very untrustworthy: 4%"></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.11)" title="Don’t know: 11%"><span>11%</span></div></div>
+<p class="cond">Andy Burnham (Prime Minister of the United Kingdom)</p>
+<div class="bar pair"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.17)" title="Very trustworthy: 17%"><span>17%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.32)" title="Somewhat trustworthy: 32%"><span>32%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.18)" title="Neither: 18%"><span>18%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.11)" title="Somewhat untrustworthy: 11%"><span>11%</span></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.19)" title="Very untrustworthy: 19%"><span>19%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.03)" title="Don’t know: 3%"></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">Very trustworthy</span></li><li><span class="sw t-decrease-2"></span><span class="lb">Somewhat trustworthy</span></li><li><span class="sw t-neutral"></span><span class="lb">Neither</span></li><li><span class="sw t-increase-2"></span><span class="lb">Somewhat untrustworthy — 5% / 11%</span></li><li><span class="sw t-increase-3"></span><span class="lb">Very untrustworthy — 4% / 19%</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know — 11% / 3%</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>The Chancellor is narrowly trusted in his Budget week.</h1>
+<p class="desc"><strong>35%</strong> call John Healey trustworthy and <strong>29%</strong> untrustworthy. Fieldwork began on Budget day.</p>
+<div class="spacer"></div>
+<p class="q">How trustworthy or untrustworthy do you think each of the following people is? John Healey MP (Chancellor of the Exchequer)</p>
+<div class="bar"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.08)" title="Very trustworthy: 8%"><span>8%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.27)" title="Somewhat trustworthy: 27%"><span>27%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.26)" title="Neither: 26%"><span>26%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.15)" title="Somewhat untrustworthy: 15%"><span>15%</span></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.14)" title="Very untrustworthy: 14%"><span>14%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.1)" title="Don’t know: 10%"><span>10%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">Very trustworthy</span></li><li><span class="sw t-decrease-2"></span><span class="lb">Somewhat trustworthy</span></li><li><span class="sw t-neutral"></span><span class="lb">Neither</span></li><li><span class="sw t-increase-2"></span><span class="lb">Somewhat untrustworthy</span></li><li><span class="sw t-increase-3"></span><span class="lb">Very untrustworthy</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Trump and Putin are distrusted.</h1>
+<p class="desc"><strong>55%</strong> call Donald Trump very untrustworthy and <strong>62%</strong> Vladimir Putin.</p>
+<div class="spacer"></div>
+<p class="q">And how trustworthy or untrustworthy do you think each of the following people is?</p>
+<p class="cond">Donald Trump (President of the United States)</p>
+<div class="bar pair"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.07)" title="Very trustworthy: 7%"><span>7%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.11)" title="Somewhat trustworthy: 11%"><span>11%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.12)" title="Neither: 12%"><span>12%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.13)" title="Somewhat untrustworthy: 13%"><span>13%</span></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.55)" title="Very untrustworthy: 55%"><span>55%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.02)" title="Don’t know: 2%"></div></div>
+<p class="cond">Vladimir Putin (President of Russia)</p>
+<div class="bar pair"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.05)" title="Very trustworthy: 5%"></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.08)" title="Somewhat trustworthy: 8%"><span>8%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.13)" title="Neither: 13%"><span>13%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.08)" title="Somewhat untrustworthy: 8%"><span>8%</span></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.62)" title="Very untrustworthy: 62%"><span>62%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.04)" title="Don’t know: 4%"></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">Very trustworthy — 7% / 5%</span></li><li><span class="sw t-decrease-2"></span><span class="lb">Somewhat trustworthy</span></li><li><span class="sw t-neutral"></span><span class="lb">Neither</span></li><li><span class="sw t-increase-2"></span><span class="lb">Somewhat untrustworthy</span></li><li><span class="sw t-increase-3"></span><span class="lb">Very untrustworthy</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know — 2% / 4%</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>The armed forces are the most trusted institution.</h1>
+<p class="desc"><strong>22%</strong> name the armed forces as the institution they trust most, ahead of charities on <strong>15%</strong> and the BBC on <strong>13%</strong>.</p>
+<div class="spacer"></div>
+<p class="q">Which of these do you trust the most?</p>
+<div class="bar"><div class="seg t-decrease-3" style="width:calc((100% - 12px) * 0.22)" title="The armed forces: 22%"><span>22%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 12px) * 0.15)" title="Charities: 15%"><span>15%</span></div><span class="seam"></span><div class="seg t-decrease-1" style="width:calc((100% - 12px) * 0.13)" title="The BBC: 13%"><span>13%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.38)" title="Other institutions: 38%"><span>38%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.12)" title="Don’t know: 12%"><span>12%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">The armed forces</span></li><li><span class="sw t-decrease-2"></span><span class="lb">Charities</span></li><li><span class="sw t-decrease-1"></span><span class="lb">The BBC</span></li><li><span class="sw t-neutral"></span><span class="lb">Other institutions</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Parliament is the least trusted institution.</h1>
+<p class="desc"><strong>24%</strong> name Parliament as the institution they trust least, with social media companies on <strong>23%</strong> and AI chatbots on <strong>14%</strong>.</p>
+<div class="spacer"></div>
+<p class="q">And which of these do you trust the least?</p>
+<div class="bar"><div class="seg t-increase-3" style="width:calc((100% - 12px) * 0.24)" title="Parliament: 24%"><span>24%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 12px) * 0.23)" title="Social media companies: 23%"><span>23%</span></div><span class="seam"></span><div class="seg t-increase-1" style="width:calc((100% - 12px) * 0.14)" title="AI chatbots like ChatGPT or Claude: 14%"><span>14%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.32)" title="Other institutions: 32%"><span>32%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.07)" title="Don’t know: 7%"><span>7%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-increase-3"></span><span class="lb">Parliament</span></li><li><span class="sw t-increase-2"></span><span class="lb">Social media companies</span></li><li><span class="sw t-increase-1"></span><span class="lb">AI chatbots like ChatGPT or Claude</span></li><li><span class="sw t-neutral"></span><span class="lb">Other institutions</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>The government is not trusted to cut taxes.</h1>
+<p class="desc">Of eight aims tested, lower taxes scored worst: <strong>23%</strong> trust the government to deliver them and <strong>58%</strong> do not.</p>
+<div class="spacer"></div>
+<p class="q">[Verbatim question wording to add]: “Lower taxes for you and your family”</p>
+<div class="bar"><div class="seg t-decrease-3" style="width:calc((100% - 15px) * 0.08)" title="A great deal: 8%"><span>8%</span></div><span class="seam"></span><div class="seg t-decrease-2" style="width:calc((100% - 15px) * 0.15)" title="A fair amount: 15%"><span>15%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 15px) * 0.16)" title="Neither: 16%"><span>16%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 15px) * 0.28)" title="Not very much: 28%"><span>28%</span></div><span class="seam"></span><div class="seg t-increase-3" style="width:calc((100% - 15px) * 0.3)" title="Not at all: 30%"><span>30%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 15px) * 0.03)" title="Don’t know: 3%"></div></div>
+
+
+<ul class="legend"><li><span class="sw t-decrease-3"></span><span class="lb">A great deal</span></li><li><span class="sw t-decrease-2"></span><span class="lb">A fair amount</span></li><li><span class="sw t-neutral"></span><span class="lb">Neither</span></li><li><span class="sw t-increase-2"></span><span class="lb">Not very much</span></li><li><span class="sw t-increase-3"></span><span class="lb">Not at all</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know — 3%</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+<section class="slide"><div class="scaler"><article>
+<div class="mark"><span class="tagline">adam smith</span><span class="word">INSIGHTS</span></div>
+<h1>Britons split three ways on who gives them the worst deal.</h1>
+<p class="desc"><strong>22%</strong> name the government, <strong>22%</strong> landlords and the rental market, and <strong>21%</strong> energy companies.</p>
+<div class="spacer"></div>
+<p class="q">Which of these do you feel gives you the worst deal?</p>
+<div class="bar"><div class="seg t-increase-3" style="width:calc((100% - 12px) * 0.22)" title="The government: 22%"><span>22%</span></div><span class="seam"></span><div class="seg t-increase-2" style="width:calc((100% - 12px) * 0.22)" title="Landlords and the rental market: 22%"><span>22%</span></div><span class="seam"></span><div class="seg t-increase-1" style="width:calc((100% - 12px) * 0.21)" title="Energy companies: 21%"><span>21%</span></div><span class="seam"></span><div class="seg t-neutral" style="width:calc((100% - 12px) * 0.28)" title="Other: 28%"><span>28%</span></div><span class="seam"></span><div class="seg t-dontknow" style="width:calc((100% - 12px) * 0.07)" title="Don’t know: 7%"><span>7%</span></div></div>
+
+
+<ul class="legend"><li><span class="sw t-increase-3"></span><span class="lb">The government</span></li><li><span class="sw t-increase-2"></span><span class="lb">Landlords and the rental market</span></li><li><span class="sw t-increase-1"></span><span class="lb">Energy companies</span></li><li><span class="sw t-neutral"></span><span class="lb">Other</span></li><li><span class="sw t-dontknow"></span><span class="lb">Don’t know</span></li></ul>
+<footer><p class="src">Source: Adam Smith Insights for the Adam Smith Institute. Online survey of 1,398 GB adults aged 18+, 28–29 October 2026. Weighted by age, gender, ethnicity, region and 2024 vote.</p><p class="src">Full question wording, methodology and data tables: adamsmithinsights.org/[release-page]</p></footer>
+</article></div></section>
+</div>
+<div id="rail"><button data-i="0" class="on"><span class="tp">Occupations</span><span class="nm">01</span></button><button data-i="1"><span class="tp">Politicians</span><span class="nm">02</span></button><button data-i="2"><span class="tp">Careers</span><span class="nm">03</span></button><button data-i="3"><span class="tp">Personalities</span><span class="nm">04</span></button><button data-i="4"><span class="tp">Chancellor</span><span class="nm">05</span></button><button data-i="5"><span class="tp">Leaders</span><span class="nm">06</span></button><button data-i="6"><span class="tp">Institutions</span><span class="nm">07</span></button><button data-i="7"><span class="tp">Parliament</span><span class="nm">08</span></button><button data-i="8"><span class="tp">Delivery</span><span class="nm">09</span></button><button data-i="9"><span class="tp">Value</span><span class="nm">10</span></button></div>
+</div>
+<script>
+(function(){
+ var stage=document.getElementById('stage'),track=document.getElementById('track'),rail=document.getElementById('rail');
+ function fit(){
+  var w=Math.max(stage.clientWidth-136,240),h=stage.clientHeight;
+  document.documentElement.style.setProperty('--s',Math.min(w/1920,h/1080));
+ }
+ function active(){
+  var i=Math.round(track.scrollTop/(track.clientHeight||1));
+  [].forEach.call(rail.children,function(b,n){b.className=n===i?'on':'';});
+ }
+ rail.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  track.scrollTo({top:+b.dataset.i*track.clientHeight,behavior:'smooth'});
+ });
+ track.addEventListener('scroll',active);
+ (window.ResizeObserver?new ResizeObserver(fit).observe(stage):window.addEventListener('resize',fit));
+ fit();
+})();
+</script>
+</body></html>
